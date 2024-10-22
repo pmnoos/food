@@ -1,0 +1,16 @@
+{% extends 'base.html'%}
+
+{% block content %}
+
+<h1>Create a new shopping list</h1>
+<ul>
+    {% for item in shopping_list %}
+        <li>{{ item.product.name }} from {{ item.store.name }} - Quantity:
+             {{ item.quantity }} - Date: {{ item.date }} Total: </li>
+    {% empty %}
+        <li>Your shopping list is empty.</li>
+    {% endfor %}
+</ul>
+{% endblock %}    
+    
+

@@ -1,0 +1,68 @@
+body{
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(203, 231, 208);
+
+}
+.h1, h2, h3, h4, h5, h6{
+    color: #688868;
+}
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.burger {
+    cursor: pointer;
+    display: none; /* Hidden by default */
+}
+
+.burger .line {
+    width: 25px;
+    height: 3px;
+    background-color: black;
+    margin: 5px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin: 0 15px;
+}
+
+.logos {
+    display: flex; /* Use flexbox to align items in a row */
+    justify-content: center; /* Center the logos horizontally */
+    align-items: center; /* Center the logos vertically */
+    flex-wrap: nowrap; /* Prevent logos from wrapping to the next line */
+}
+
+.logo {
+    width: 10px; /* Set a uniform width for all logos */
+    height: auto; /* Maintain aspect ratio */
+    margin: 0 5px; /* Add some space between logos */
+}
+@media (max-width: 768px) {
+    .burger {
+        display: flex; /* Show burger on small screens */
+    }
+
+    .nav-links {
+        display: none; /* Hide links by default */
+        flex-direction: column;
+        position: absolute;
+        top: 60px; /* Adjust based on your layout */
+        background-color: white; /* Background color for dropdown */
+        width: 100%;
+    }
+
+    .nav-links.active {
+        display: flex; /* Show links when active */
+    }
+}

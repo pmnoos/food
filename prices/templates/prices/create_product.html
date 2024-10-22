@@ -1,0 +1,17 @@
+
+
+{% extends 'base.html'%}
+
+{% block content %}
+
+<h1>Create a new Product</h1>
+ <div class="container mt-5">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Renders the form fields -->
+        <button type="submit">Create Product</button>
+    </form>
+    </div>
+
+{% endblock %}    
+

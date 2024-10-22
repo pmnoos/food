@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h1 class="mb-4">Delete Purchase</h1>
+            <p>Are you sure you want to delete the purchase for {{ purchase.item_product }} from {{ purchase.store_name }}?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                <a href="{% url 'purchase_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

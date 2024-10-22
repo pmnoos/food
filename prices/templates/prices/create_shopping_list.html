@@ -1,0 +1,16 @@
+
+
+{% extends 'base.html'%}
+
+{% block content %}
+
+<h1>Create a new Shopping List</h1>
+ <div class="container mt-5">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Renders the form fields -->
+        <button type="submit">Create Shopping List</button>
+    </form>
+    </div>
+
+{% endblock %}    
