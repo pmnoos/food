@@ -39,6 +39,7 @@ class Purchase(models.Model):
     quantity = models.DecimalField(max_digits=8, decimal_places=4) 
     total_cost = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
     running_total = models.DecimalField(max_digits=10, decimal_places=2, editable=False)
+    year = models.IntegerField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # Calculate total cost
@@ -57,3 +58,8 @@ class Purchase(models.Model):
 
     def __str__(self):
         return f"{self.item_product} from {self.store_name} on {self.date_of_purchase}"
+
+def save(self, *args, **kwargs):
+    if self.date_of_purchase and not self.year:
+        self.year = self.date_of_purchase.year
+    super().save(*args, **kwargs)

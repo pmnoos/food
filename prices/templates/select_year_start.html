@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Year Start</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 2rem;
+        }
+
+        input[type="date"] {
+            padding: 0.5rem;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            margin-left: 10px;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .results {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        a.btn-secondary {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        a.btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <h1>Select Your Custom Year Start</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" required>
+        <button type="submit">Calculate Total</button>
+    </form>
+
+    {% if start_date %}
+        <div class="results">
+            <h3>From {{ start_date }}:</h3>
+            <p><strong>Total Spent:</strong> ${{ total }}</p>
+        </div>
+    {% endif %}
+
+    <a href="{% url 'purchase_list' %}" class="btn-secondary">← Return to Purchases</a>
+</body>
+</html>

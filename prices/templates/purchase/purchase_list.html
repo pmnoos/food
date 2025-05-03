@@ -56,8 +56,12 @@
                             <td>{{ purchase.quantity }}</td>
                             <td>{{ purchase.total_price|floatformat:2 }}</td>
                             <td>
-                                <a href="{% url 'edit_purchase' purchase.id %}" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="{% url 'delete_purchase' purchase.id %}" class="btn btn-danger btn-sm">Delete</a>
+                               
+                            <a href="{% url 'edit_purchase' purchase.id %}" class="btn btn-warning btn-sm">Edit</a>
+                        <form action="{% url 'delete_purchase' purchase.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
                             </td>
                         </tr>
                         {% empty %}

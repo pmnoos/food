@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'prices.apps.PricesConfig',
+    
 ]
 
 MIDDLEWARE = [
@@ -55,6 +56,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'food_costs.urls'
+
+
+TEXTUAL_APP_PATH = os.path.join(BASE_DIR, 'food', 'textual')
 
 TEMPLATES = [
     {

@@ -1,6 +1,8 @@
 from django import forms as forms
 from .models import Product, Store, ShoppingList, Purchase
 
+
+
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
@@ -48,6 +50,10 @@ class PurchaseForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'  # Add Bootstrap class to all fields
 
+from django import forms
+
+class YearStartForm(forms.Form):
+    start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label="Start Date for Year")
         
       
         

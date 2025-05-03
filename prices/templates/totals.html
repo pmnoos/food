@@ -1,0 +1,85 @@
+{% load static %}
+{% load custom_filters %}
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Totals Summary</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body class="w3-light-grey">
+<!-- Filter by month -->
+<form method="get" class="w3-margin-bottom w3-padding">
+    <label class="w3-text-grey">Filter by Month:</label>
+    <select name="month" class="w3-select w3-border" onchange="this.form.submit()">
+      <option value="">All Months</option>
+      {% for i in 1|to_range:13 %}
+        <option value="{{ i }}" {% if selected_month|default:'' == i|stringformat:'s' %}selected{% endif %}>
+          {{ i|get_month_name }}
+        </option>
+      {% endfor %}
+    </select>
+  </form>
+  
+<div class="w3-container w3-margin-top w3-card-4 w3-white w3-padding">
+    <h2 class="w3-center">Spending Totals</h2>
+
+    <!-- Filter by month -->
+    <form method="get" class="w3-margin-bottom w3-padding">
+        <label class="w3-text-grey">Filter by Month:</label>
+        <select name="month" class="w3-select w3-border" onchange="this.form.submit()">
+            <option value="">All Months</option>
+            {% for i in 1|to_range:12 %}
+                <option value="{{ i }}" {% if selected_month|default:'' == i|stringformat:'s' %}selected{% endif %}>
+                    {{ i|get_month_name }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <!-- Totals Summary -->
+    <div class="w3-row-padding w3-section">
+        <div class="w3-third">
+            <div class="w3-container w3-pale-green w3-padding w3-round">
+                <h4>Weekly Total</h4>
+                <p>${{ weekly_total }}</p>
+            </div>
+        </div>
+        <div class="w3-third">
+            <div class="w3-container w3-pale-blue w3-padding w3-round">
+                <h4>Monthly Total</h4>
+                <p>${{ monthly_total }}</p>
+            </div>
+        </div>
+        <div class="w3-third">
+            <div class="w3-container w3-pale-yellow w3-padding w3-round">
+                <h4>Yearly Total</h4>
+                <p>${{ yearly_total }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Store Totals -->
+    <h3 class="w3-margin-top">Total by Store</h3>
+    <ul class="w3-ul w3-card-4">
+        {% for store in store_totals %}
+            <li class="w3-bar">
+                <span class="w3-bar-item w3-large">{{ store.store_name }}</span>
+                <span class="w3-bar-item w3-right">${{ store.total }}</span>
+            </li>
+        {% empty %}
+            <li class="w3-bar">No purchases found.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Back Button -->
+    <div class="w3-center w3-margin-top">
+        <a href="{% url 'purchase_list' %}" class="w3-button w3-blue w3-round w3-margin-top">← Back to Purchases</a>
+    </div>
+</div>
+
+</body>
+</html>

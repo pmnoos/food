@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-6 offset-md-3">
             <h1 class="mb-4">Edit Purchase</h1>
-            <form method="post" class="bg-light p-4 border rounded">
+
+            <!-- ✅ Correct action with purchase.id -->
+            <form method="post" action="{% url 'edit_purchase' purchase.id %}" class="bg-light p-4 border rounded">
                 {% csrf_token %}
+                
                 <div class="form-group">
                     <label for="{{ form.store_name.id_for_label }}">{{ form.store_name.label }}</label>
                     {{ form.store_name }}
@@ -31,8 +33,14 @@
                     <label for="{{ form.quantity.id_for_label }}">{{ form.quantity.label }}</label>
                     {{ form.quantity }}
                 </div>
+
                 <button type="submit" class="btn btn-primary">Update Purchase</button>
                 <a href="{% url 'purchase_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" name="save">Save Changes</button>
             </form>
         </div>
     </div>

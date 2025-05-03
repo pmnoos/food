@@ -35,6 +35,14 @@
         <img src="{% static 'img/footes.png' %}" alt="Footes" class=" width="80" height="auto"logo6">
     </div>    
     <div class="container">
+        {% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
         {% block content %}
         {% endblock %}
     </div>
