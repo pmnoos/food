@@ -44,7 +44,7 @@ def totals_view(request):
     # Filter purchases by year
     purchases_query = Purchase.objects.filter(date_of_purchase__year=year_filter)
 
-    # ✅ Apply additional filter by selected month if provided
+    # Apply additional filter by selected month if provided
     if month_filter:
         purchases_query = purchases_query.filter(date_of_purchase__month=month_filter)
 
@@ -52,9 +52,6 @@ def totals_view(request):
     store_totals = purchases_query.values('store_name').annotate(
         total=Sum('total_cost')
     ).order_by('-total')
-
-    for store in store_totals:
-        store['total'] = round(store['total'], 2) if store['total'] else 0
 
     # Weekly, monthly, and yearly totals
     weekly_total = purchases_query.filter(date_of_purchase__gte=start_of_week).aggregate(
@@ -67,16 +64,13 @@ def totals_view(request):
 
     yearly_total = purchases_query.aggregate(total=Sum('total_cost'))['total'] or 0
 
-    context = {
+    return render(request, 'totals.html', {
         'store_totals': store_totals,
-        'weekly_total': round(weekly_total, 2),
-        'monthly_total': round(monthly_total, 2),
-        'yearly_total': round(yearly_total, 2),
-        'selected_month': selected_month,  # for keeping selection in the form
-    }
-
-    return render(request, 'totals.html', context)
-
+        'weekly_total': weekly_total,
+        'monthly_total': monthly_total,
+        'yearly_total': yearly_total,
+        'selected_month': selected_month,
+    })
 
 
 def home(request):
@@ -225,45 +219,45 @@ def calculator_view(request):
 
 
 def purchase_list(request):
-    store_filter = request.GET.get('store', '')
-    product_filter = request.GET.get('product', '')
-    date_filter = request.GET.get('date', '')
-    sort_order = request.GET.get('sort', 'asc')  # Default to ascending order
+    # Get filter parameters from the request
+    store_filter = request.GET.get('store', '').strip()
+    product_filter = request.GET.get('product', '').strip()
+    date_filter = request.GET.get('date', '').strip()
 
-    purchases = Purchase.objects.all()
+    # Base query for purchases
+    purchases_query = Purchase.objects.all()
 
-    # Filter by store name if provided
+    # Apply filters if provided
     if store_filter:
-        purchases = purchases.filter(store_name__icontains=store_filter)
-    
-    # Filter by product name if provided
+        purchases_query = purchases_query.filter(store_name__icontains=store_filter)
     if product_filter:
-        purchases = purchases.filter(item_product__icontains=product_filter)
-
-    # Filter purchases by the exact date if provided
+        purchases_query = purchases_query.filter(item_product__icontains=product_filter)
     if date_filter:
-        purchases = purchases.filter(date_of_purchase=date_filter)
+        try:
+            # Validate the date format before filtering
+            datetime.strptime(date_filter, '%Y-%m-%d')
+            purchases_query = purchases_query.filter(date_of_purchase=date_filter)
+        except ValueError:
+            # If the date is invalid, ignore the filter or handle the error
+            messages.error(request, "Invalid date format. Please use YYYY-MM-DD.")
 
-    # Apply sorting based on the sort_order parameter
-    if sort_order == 'desc':
-        purchases = purchases.order_by('-date_of_purchase')  # Descending order
-    else:
-        purchases = purchases.order_by('date_of_purchase')  # Ascending order
+    # Calculate totals
+    total_running = sum(purchase.price_cost * purchase.quantity for purchase in purchases_query)
+    total_spent = purchases_query.aggregate(total=Sum('total_cost'))['total'] or 0
 
-    # Calculate the total amount spent at the store on the specified date
-    total_spent = purchases.aggregate(total_spent=Sum('total_cost'))['total_spent'] or 0
-
-    # Calculate the running total for display
-    total_running = sum(purchase.price_cost * purchase.quantity for purchase in purchases)
+    # Paginate the results
+    paginator = Paginator(purchases_query, 10)  # Show 10 purchases per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     return render(request, 'purchase/purchase_list.html', {
-        'purchases': purchases,
-        'total_running': total_running,
-        'total_spent': total_spent,
+        'purchases': page_obj,
+        'page_obj': page_obj,
         'store_filter': store_filter,
         'product_filter': product_filter,
         'date_filter': date_filter,
-        'sort_order': sort_order,  # Pass the sort order to the template
+        'total_running': total_running,
+        'total_spent': total_spent,
     })
 from django.contrib import messages
 

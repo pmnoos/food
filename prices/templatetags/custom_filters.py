@@ -6,8 +6,8 @@ register = template.Library()
 def to_range(start, end):
     return range(start, end)
 
-import calendar
 from django import template
+import calendar
 
 register = template.Library()
 
