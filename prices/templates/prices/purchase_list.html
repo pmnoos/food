@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Purchase List</h2>
+
+  <!-- Filter Form -->
+  <form method="get" class="row g-3 mb-3">
+    <div class="col-md-3">
+        <label for="store" class="form-label">Filter by Store</label>
+        <select name="store" id="store" class="form-select">
+            <option value="">All Stores</option>
+            {% for store in store_choices %}
+                <option value="{{ store }}" {% if request.GET.store == store %}selected{% endif %}>{{ store }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label for="product" class="form-label">Filter by Product</label>
+        <select name="product" id="product" class="form-select">
+            <option value="">All Products</option>
+            {% for product in product_choices %}
+                <option value="{{ product }}" {% if request.GET.product == product %}selected{% endif %}>{{ product }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" name="date" id="date" class="form-control" value="{{ request.GET.date }}">
+    </div>
+
+    <div class="col-md-2">
+        <label for="records_per_page" class="form-label">Records Per Page</label>
+        <select name="records_per_page" class="form-select">
+            {% for option in records_per_page_options %}
+                <option value="{{ option }}" {% if request.GET.records_per_page == option|stringformat:"s" %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-md-1 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+</form>
+<div class="mb-3">
+  <h4>Total Sum of Purchases: ${{ total_sum|floatformat:"-2" }}</h4>
+</div>
+  <!-- Purchase Table -->
+  <table class="table table-striped table-bordered">
+    <thead class="table-dark">
+      <tr>
+        <th>Date</th>
+        <th>Store</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Total</th>
+        <th colspan="2">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for purchase in purchases %}
+        <tr>
+          <td>{{ purchase.date_of_purchase }}</td>
+          <td>{{ purchase.store_name }}</td>
+          <td>{{ purchase.item_product }}</td>
+          <td>{{ purchase.quantity|floatformat:"-2" }}</td>
+          <td>${{ purchase.price_cost|floatformat:"-2" }}</td>
+          <td>${{ purchase.total_cost|floatformat:"-2" }}</td>
+          <td><a href="{% url 'edit_purchase' purchase.id %}" class="btn btn-sm btn-warning">Edit</a></td>
+          <td><a href="{% url 'delete_purchase' purchase.id %}" class="btn btn-sm btn-danger">Delete</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8" class="text-center">No purchases found.</td></tr>
+      {% endfor %}
+    </tbody>
+  <!-- Pagination -->
+  <div class="d-flex justify-content-between">
+    <div>
+      Page {{ purchases.number }} of {{ purchases.paginator.num_pages }}
+    </div>
+    <nav>
+      <ul class="pagination">
+        {% if purchases.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ purchases.previous_page_number }}">&laquo; Previous</a>
+          </li>
+          
+        {% endif %}
+
+        {% for num in purchases.paginator.page_range %}
+          {% if num == purchases.number %}
+            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+          {% elif num > purchases.number|add:'-3' and num < purchases.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if purchases.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ purchases.next_page_number }}">Next &raquo;</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+</div>
+{% endblock %}

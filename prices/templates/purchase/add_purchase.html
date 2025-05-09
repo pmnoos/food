@@ -9,23 +9,25 @@
                     {% csrf_token %}
                     <div class="mb-3">
                         <div class="row align-items-center">
-                        <div class="col-10">
-                        {{ form.store_name.label_tag }}
-                        {{ form.store_name }}
-                        {{ form.date_of_purchase.label_tag }}
-                        {{ form.date_of_purchase }}
-                        {{ form.item_product.label_tag }}
-                        {{ form.item_product }}
-                        {{ form.package_unit_type.label_tag }}
-                        {{ form.package_unit_type }}
-                        {{ form.price_cost.label_tag }}
-                        {{ form.price_cost }}
-                        {{ form.quantity.label_tag }}
-                        {{ form.quantity }}
+                            <div class="col-10">
+                                {{ form.store_name.label_tag }}
+                                {{ form.store_name }}
+                                {{ form.date_of_purchase.label_tag }}
+                                {{ form.date_of_purchase }}
+                                {{ form.item_product.label_tag }}
+                                {{ form.item_product }}
+                                {{ form.package_unit_type.label_tag }}
+                                {{ form.package_unit_type }}
+                                {{ form.price_cost.label_tag }}
+                                {{ form.price_cost }}
+                                {{ form.quantity.label_tag }}
+                                {{ form.quantity }}
+                            </div>
+                        </div>
                     </div>
                     <div class="m-3">                   
-                     <button type="submit" class="btn btn-primary">Add</button>
-                     </div>
+                        <button type="submit" class="btn btn-primary">Add</button>
+                    </div>
                 </form>
                 <div class="mt-3">
                     <a href="{% url 'purchase_list' %}" class="btn btn-secondary">Back to List</a>
@@ -34,5 +36,11 @@
         </div>
     </div> 
 </div> 
-<script> window.onload = function() { document.getElementById('{{ form.item_product.id_for_label }}').focus(); }; </script>
+
+<!-- JavaScript to focus on the product field after page load -->
+<script>
+    window.onload = function() {
+        document.getElementById('{{ form.item_product.id_for_label }}').focus();
+    };
+</script>
 {% endblock %}

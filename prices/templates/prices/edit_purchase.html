@@ -37,11 +37,6 @@
                 <button type="submit" class="btn btn-primary">Update Purchase</button>
                 <a href="{% url 'purchase_list' %}" class="btn btn-secondary">Cancel</a>
             </form>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" name="save">Save Changes</button>
-            </form>
         </div>
     </div>
 </div>
