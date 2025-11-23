@@ -1,111 +1,99 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
 {% block content %}
 <div class="container mt-4">
-  <h2>Purchase List</h2>
+  <h2 class="mb-4">Purchases</h2>
 
   <!-- Filter Form -->
-  <form method="get" class="row g-3 mb-3">
-    <div class="col-md-3">
-        <label for="store" class="form-label">Filter by Store</label>
-        <select name="store" id="store" class="form-select">
-            <option value="">All Stores</option>
-            {% for store in store_choices %}
-                <option value="{{ store }}" {% if request.GET.store == store %}selected{% endif %}>{{ store }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div class="col-md-3">
-        <label for="product" class="form-label">Filter by Product</label>
-        <select name="product" id="product" class="form-select">
-            <option value="">All Products</option>
-            {% for product in product_choices %}
-                <option value="{{ product }}" {% if request.GET.product == product %}selected{% endif %}>{{ product }}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <div class="col-md-3">
-        <label for="date" class="form-label">Date</label>
-        <input type="date" name="date" id="date" class="form-control" value="{{ request.GET.date }}">
-    </div>
-
+  <form method="get" class="row g-3 mb-4">
     <div class="col-md-2">
-        <label for="records_per_page" class="form-label">Records Per Page</label>
-        <select name="records_per_page" class="form-select">
-            {% for option in records_per_page_options %}
-                <option value="{{ option }}" {% if request.GET.records_per_page == option|stringformat:"s" %}selected{% endif %}>{{ option }}</option>
-            {% endfor %}
-        </select>
+      <select name="year" class="form-select">
+        <option value="">Year</option>
+        {% for year in year_choices %}
+          <option value="{{ year }}" {% if selected_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+        {% endfor %}
+      </select>
     </div>
+    <div class="col-md-2">
+      <select name="month" class="form-select">
+        <option value="">Month</option>
+        {% for month in month_choices %}
+          <option value="{{ month }}" {% if selected_month == month|stringformat:"s" %}selected{% endif %}>{{ month }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="store" class="form-select">
+        <option value="">Store</option>
+        {% for store in store_choices %}
+          <option value="{{ store }}" {% if selected_store == store %}selected{% endif %}>{{ store }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="product" class="form-select">
+        <option value="">Product</option>
+        {% for product in product_choices %}
+          <option value="{{ product }}" {% if selected_product == product %}selected{% endif %}>{{ product }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <input type="date" name="date" class="form-control" value="{{ date_filter }}">
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn btn-secondary">Filter</button>
+      <a href="{% url 'prices:purchase_list' %}" class="btn btn-outline-secondary">Reset</a>
+    </div>
+  </form>
 
-    <div class="col-md-1 d-flex align-items-end">
-        <button type="submit" class="btn btn-primary w-100">Filter</button>
-    </div>
-</form>
-<div class="mb-3">
-  <h4>Total Sum of Purchases: ${{ total_sum|floatformat:"-2" }}</h4>
-</div>
-  <!-- Purchase Table -->
-  <table class="table table-striped table-bordered">
-    <thead class="table-dark">
-      <tr>
-        <th>Date</th>
-        <th>Store</th>
-        <th>Product</th>
-        <th>Quantity</th>
-        <th>Price</th>
-        <th>Total</th>
-        <th colspan="2">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for purchase in purchases %}
+  <!-- Purchases Table -->
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped table-hover">
+      <thead class="table-light">
         <tr>
+          <th>ID</th>
+          <th>Date</th>
+          <th>Store</th>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for purchase in purchases %}
+        <tr>
+          <td>{{ purchase.id }}</td>
           <td>{{ purchase.date_of_purchase }}</td>
           <td>{{ purchase.store_name }}</td>
           <td>{{ purchase.item_product }}</td>
-          <td>{{ purchase.quantity|floatformat:"-2" }}</td>
-          <td>${{ purchase.price_cost|floatformat:"-2" }}</td>
-          <td>${{ purchase.total_cost|floatformat:"-2" }}</td>
-          <td><a href="{% url 'edit_purchase' purchase.id %}" class="btn btn-sm btn-warning">Edit</a></td>
-          <td><a href="{% url 'delete_purchase' purchase.id %}" class="btn btn-sm btn-danger">Delete</a></td>
+          <td>{{ purchase.quantity }}</td>
+          <td>${{ purchase.price_cost|floatformat:2 }}</td>
+          <td>${{ purchase.total_cost|floatformat:2 }}</td>
+          <td>
+            <a href="{% url 'prices:purchase_detail' purchase.id %}" class="btn btn-sm btn-info">View</a>
+            <a href="{% url 'prices:edit_purchase' purchase.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'prices:delete_purchase' purchase.id %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
         </tr>
-      {% empty %}
-        <tr><td colspan="8" class="text-center">No purchases found.</td></tr>
-      {% endfor %}
-    </tbody>
-  <!-- Pagination -->
-  <div class="d-flex justify-content-between">
-    <div>
-      Page {{ purchases.number }} of {{ purchases.paginator.num_pages }}
-    </div>
-    <nav>
-      <ul class="pagination">
-        {% if purchases.has_previous %}
-          <li class="page-item">
-            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ purchases.previous_page_number }}">&laquo; Previous</a>
-          </li>
-          
-        {% endif %}
-
-        {% for num in purchases.paginator.page_range %}
-          {% if num == purchases.number %}
-            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-          {% elif num > purchases.number|add:'-3' and num < purchases.number|add:'3' %}
-            <li class="page-item">
-              <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ num }}">{{ num }}</a>
-            </li>
-          {% endif %}
+        {% empty %}
+        <tr>
+          <td colspan="8" class="text-center">No purchases found.</td>
+        </tr>
         {% endfor %}
+      </tbody>
+    </table>
+  </div>
 
-        {% if purchases.has_next %}
-          <li class="page-item">
-            <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}page={{ purchases.next_page_number }}">Next &raquo;</a>
-          </li>
-        {% endif %}
-      </ul>
-    </nav>
+  <!-- Totals -->
+  <div class="mt-4">
+    <div class="alert alert-secondary">
+      <strong>Weekly Total:</strong> ${{ weekly_total|floatformat:2 }}<br>
+      <strong>Monthly Total:</strong> ${{ monthly_total|floatformat:2 }}<br>
+      <strong>Yearly Total:</strong> ${{ yearly_total|floatformat:2 }}
+    </div>
   </div>
 </div>
 {% endblock %}

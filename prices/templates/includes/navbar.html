@@ -1,34 +1,77 @@
-<div class="container">
-<nav class="navbar navbar-expand-sm bg-success navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'home' %}">Shopping</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+<div class="container-fluid px-0">
+<nav class="navbar navbar-expand-lg navbar-dark modern-navbar">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'prices:home' %}">
+            <i class="fas fa-shopping-cart me-2"></i>
+            <span class="brand-text">FoodCost Tracker</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'prices:home' %}">
+                        <i class="fas fa-home me-1"></i>Dashboard
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'purchase_list' %}">Product</a>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'purchase_list' %}active{% endif %}" href="{% url 'prices:purchase_list' %}">
+                        <i class="fas fa-list me-1"></i>Purchases
+                    </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'add_purchase' %}">Purchases</a>
-                 <li class="nav-item">
-                   <a class="nav-link" href="{% url 'totals' %}">Totals</a>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'select_year_start' %}">Start Year</a>
-                </li>  
-                 </li>    
+                    <a class="nav-link {% if request.resolver_match.url_name == 'add_purchase' %}active{% endif %}" href="{% url 'prices:add_purchase' %}">
+                        <i class="fas fa-plus me-1"></i>Add Purchase
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'store_list' or request.resolver_match.url_name == 'create_store' %}active{% endif %}" href="#" id="storesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-store me-1"></i>Stores
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'prices:store_list' %}">
+                            <i class="fas fa-list me-2"></i>View All Stores
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'prices:create_store' %}">
+                            <i class="fas fa-plus me-2"></i>Add New Store
+                        </a></li>
+                    </ul>
                 </li>
                 <li class="nav-item">
-                  <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                  </form>
+                    <a class="nav-link {% if request.resolver_match.url_name == 'totals' %}active{% endif %}" href="{% url 'prices:totals' %}">
+                        <i class="fas fa-chart-bar me-1"></i>Analytics
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-cog me-1"></i>Settings
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'prices:select_year_start' %}">
+                            <i class="fas fa-calendar-alt me-2"></i>Start Year
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'prices:store_list' %}">
+                            <i class="fas fa-store me-2"></i>Manage Stores
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'prices:create_store' %}">
+                            <i class="fas fa-plus me-2"></i>Add New Store
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'prices:product_list' %}">
+                            <i class="fas fa-box me-2"></i>Manage Products
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'prices:create_product' %}">
+                            <i class="fas fa-plus me-2"></i>Add New Product
+                        </a></li>
+                    </ul>
                 </li>
             </ul>
+            <div class="d-flex">
+                <div class="navbar-text me-3">
+                    <i class="fas fa-user-circle me-1"></i>
+                    <span class="text-light">Welcome!</span>
+                </div>
+            </div>
         </div>
     </div>
 </nav>

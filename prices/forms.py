@@ -1,7 +1,5 @@
-from django import forms as forms
+from django import forms
 from .models import Product, Store, ShoppingList, Purchase
-
-
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -32,17 +30,12 @@ class ShoppingListForm(forms.ModelForm):
             'quantity': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Quantity'}),
         }
 
-
-
-from django import forms
-from .models import Purchase
-
 class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
         fields = ['store_name', 'date_of_purchase', 'item_product', 'package_unit_type', 'price_cost', 'quantity']
         widgets = {
-            'date_of_purchase': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'date_of_purchase': forms.DateInput(attrs={'type': 'date'}),
         }
     
     def __init__(self, *args, **kwargs):
@@ -50,10 +43,23 @@ class PurchaseForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'  # Add Bootstrap class to all fields
 
-from django import forms
-
 class YearStartForm(forms.Form):
     start_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}), label="Start Date for Year")
-        
-      
-        
+    
+    
+class PurchaseFilterForm(forms.Form):
+    store = forms.CharField(required=False, label="Store", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    product = forms.CharField(required=False, label="Product", widget=forms.TextInput(attrs={'class': 'form-control'}))
+    date = forms.DateField(
+        required=False,
+        label="Date",
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        input_formats=['%Y-%m-%d']
+    )
+    records_per_page = forms.ChoiceField(
+        required=False,
+        choices=[(10, '10'), (30, '30'), (50, '50')],
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        initial=10
+    )    
+    

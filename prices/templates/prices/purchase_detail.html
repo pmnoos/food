@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Purchase Details</h2>
+  <table class="table table-bordered mt-3">
+    <tr>
+      <th>ID</th>
+      <td>{{ purchase.id }}</td>
+    </tr>
+    <tr>
+      <th>Date</th>
+      <td>{{ purchase.date_of_purchase }}</td>
+    </tr>
+    <tr>
+      <th>Store</th>
+      <td>{{ purchase.store_name }}</td>
+    </tr>
+    <tr>
+      <th>Product</th>
+      <td>{{ purchase.item_product }}</td>
+    </tr>
+    <tr>
+      <th>Quantity</th>
+      <td>{{ purchase.quantity }}</td>
+    </tr>
+    <tr>
+      <th>Price</th>
+      <td>${{ purchase.price_cost|floatformat:2 }}</td>
+    </tr>
+    <tr>
+      <th>Total</th>
+      <td>${{ purchase.total_cost|floatformat:2 }}</td>
+    </tr>
+  </table>
+  <a href="{% url 'prices:purchase_list' %}" class="btn btn-secondary">Back to List</a>
+  <a href="{% url 'prices:edit_purchase' purchase.id %}" class="btn btn-warning">Edit</a>
+  <a href="{% url 'prices:delete_purchase' purchase.id %}" class="btn btn-danger">Delete</a>
+</div>
+{% endblock %}

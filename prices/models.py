@@ -42,6 +42,10 @@ class Purchase(models.Model):
     year = models.IntegerField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
+        # Set year from date if not already set
+        if self.date_of_purchase and not self.year:
+            self.year = self.date_of_purchase.year
+            
         # Calculate total cost
         self.total_cost = self.price_cost * self.quantity
         
@@ -58,8 +62,3 @@ class Purchase(models.Model):
 
     def __str__(self):
         return f"{self.item_product} from {self.store_name} on {self.date_of_purchase}"
-
-def save(self, *args, **kwargs):
-    if self.date_of_purchase and not self.year:
-        self.year = self.date_of_purchase.year
-    super().save(*args, **kwargs)

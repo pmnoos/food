@@ -1,85 +1,207 @@
-{% load static %}
-{% load custom_filters %}
-
-
-
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Totals Summary</title>
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-</head>
-<body class="w3-light-grey">
-<!-- Filter by month -->
-<form method="get" class="w3-margin-bottom w3-padding">
-    <label class="w3-text-grey">Filter by Month:</label>
-    <select name="month" class="w3-select w3-border" onchange="this.form.submit()">
-      <option value="">All Months</option>
-      {% for i in 1|to_range:13 %}
-        <option value="{{ i }}" {% if selected_month|default:'' == i|stringformat:'s' %}selected{% endif %}>
-          {{ i|get_month_name }}
-        </option>
-      {% endfor %}
-    </select>
-  </form>
-  
-<div class="w3-container w3-margin-top w3-card-4 w3-white w3-padding">
-    <h2 class="w3-center">Spending Totals</h2>
-
-    <!-- Filter by month -->
-    <form method="get" class="w3-margin-bottom w3-padding">
-        <label class="w3-text-grey">Filter by Month:</label>
-        <select name="month" class="w3-select w3-border" onchange="this.form.submit()">
-            <option value="">All Months</option>
-            {% for i in 1|to_range:13 %}  <!-- Ensure the range is correct -->
-                <option value="{{ i }}" {% if selected_month|default:'' == i|stringformat:'s' %}selected{% endif %}>
-                    {{ i|get_month_name }}
-                </option>
-            {% endfor %}
-        </select>
-    </form>
-
-    <!-- Totals Summary -->
-    <div class="w3-row-padding w3-section">
-        <div class="w3-third">
-            <div class="w3-container w3-pale-green w3-padding w3-round">
-                <h4>Weekly Total</h4>
-                <p>${{ weekly_total }}</p>
-            </div>
-        </div>
-        <div class="w3-third">
-            <div class="w3-container w3-pale-blue w3-padding w3-round">
-                <h4>Monthly Total</h4>
-                <p>${{ monthly_total }}</p>
-            </div>
-        </div>
-        <div class="w3-third">
-            <div class="w3-container w3-pale-yellow w3-padding w3-round">
-                <h4>Yearly Total</h4>
-                <p>${{ yearly_total }}</p>
-            </div>
-        </div>
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      <h2 class="mb-4 text-center">📊 Purchase Totals & Analytics</h2>
     </div>
+  </div>
 
-    <!-- Store Totals -->
-    <h3 class="w3-margin-top">Total by Store</h3>
-    <ul class="w3-ul w3-card-4">
-        {% for store in store_totals %}
-            <li class="w3-bar">
-                <span class="w3-bar-item w3-large">{{ store.store_name }}</span>
-                <span class="w3-bar-item w3-right">${{ store.total }}</span>
-            </li>
-        {% empty %}
-            <li class="w3-bar">No purchases found.</li>
-        {% endfor %}
-    </ul>
+  <!-- Filter Form -->
+  {% include 'includes/filter_form.html' %}
 
-    <!-- Back Button -->
-    <div class="w3-center w3-margin-top">
-        <a href="{% url 'purchase_list' %}" class="w3-button w3-blue w3-round w3-margin-top">← Back to Purchases</a>
+  <!-- Summary Cards -->
+  <div class="row mb-4">
+    <div class="col-md-4 mb-3">
+      <div class="card border-success h-100 totals-card">
+        <div class="card-body text-center">
+          <div class="d-flex justify-content-center mb-2">
+            <i class="fas fa-calendar-week text-success totals-icon" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="card-title text-success">Weekly Total</h5>
+          <h3 class="card-text text-success">${{ weekly_total|floatformat:2 }}</h3>
+          <small class="text-muted">Last 7 days</small>
+        </div>
+      </div>
     </div>
+    <div class="col-md-4 mb-3">
+      <div class="card border-primary h-100 totals-card">
+        <div class="card-body text-center">
+          <div class="d-flex justify-content-center mb-2">
+            <i class="fas fa-calendar-alt text-primary totals-icon" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="card-title text-primary">Monthly Total</h5>
+          <h3 class="card-text text-primary">${{ monthly_total|floatformat:2 }}</h3>
+          <small class="text-muted">Current month ({{ now|date:"F Y" }})</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card border-warning h-100 totals-card">
+        <div class="card-body text-center">
+          <div class="d-flex justify-content-center mb-2">
+            <i class="fas fa-calendar text-warning totals-icon" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="card-title text-warning">Yearly Total</h5>
+          <h3 class="card-text text-warning">${{ yearly_total|floatformat:2 }}</h3>
+          <small class="text-muted">Current year ({{ now|date:"Y" }})</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtered Results (when filters are applied) -->
+  {% if selected_year or selected_month or selected_store or selected_product or date_filter %}
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-info">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-filter me-2"></i>Filtered Results
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <h3 class="text-info">${{ filtered_total|floatformat:2 }}</h3>
+          <p class="text-muted mb-0">Total for your current filter selection</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Store Breakdown -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card store-breakdown-card">
+        <div class="card-header bg-light">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-store text-primary"></i> Store Breakdown
+          </h5>
+</div>
+        <div class="card-body p-0">
+          {% if store_totals %}
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="border-0">
+                      <i class="fas fa-store text-muted"></i> Store Name
+                    </th>
+                    <th class="border-0 text-end">
+                      <i class="fas fa-dollar-sign text-muted"></i> Total Spent
+                    </th>
+                    <th class="border-0 text-center">
+                      <i class="fas fa-percentage text-muted"></i> Percentage
+                    </th>
+                    <th class="border-0 text-center">
+                      <i class="fas fa-chart-bar text-muted"></i> Visual
+                    </th>
+  </tr>
+                </thead>
+                <tbody>
+  {% for store in store_totals %}
+                    {% if yearly_total > 0 %}
+                      {% widthratio store.total yearly_total 100 as percentage %}
+                    {% else %}
+                      {% widthratio 0 1 100 as percentage %}
+                    {% endif %}
+                    <tr>
+                      <td class="fw-bold">
+                        <i class="fas fa-shopping-cart text-success me-2"></i>
+                        {{ store.store_name }}
+                      </td>
+                      <td class="text-end fw-bold text-success">
+                        ${{ store.total|floatformat:2 }}
+                      </td>
+                      <td class="text-center">
+                        <span class="badge bg-info">{{ percentage }}%</span>
+                      </td>
+                      <td class="text-center">
+                        <div class="progress" style="height: 20px; width: 100px;">
+                          <div class="progress-bar bg-success" role="progressbar" 
+                               style="width: {{ percentage }}%" 
+                               aria-valuenow="{{ percentage }}" 
+                               aria-valuemin="0" 
+                               aria-valuemax="100">
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-inbox text-muted" style="font-size: 3rem;"></i>
+              <p class="text-muted mt-2">No store data available</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Purchases -->
+  {% if purchases %}
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header bg-light">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-receipt text-primary"></i> Recent Purchases
+            </h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-sm table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="border-0">Date</th>
+                    <th class="border-0">Store</th>
+                    <th class="border-0">Product</th>
+                    <th class="border-0 text-end">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for purchase in purchases|slice:":10" %}
+                    <tr>
+                      <td>{{ purchase.date_of_purchase|date:"M d, Y" }}</td>
+                      <td>
+                        <i class="fas fa-store text-success me-1"></i>
+                        {{ purchase.store_name }}
+                      </td>
+                      <td>{{ purchase.item_product }}</td>
+                      <td class="text-end fw-bold text-success">
+                        ${{ purchase.total_cost|floatformat:2 }}
+                      </td>
+  </tr>
+  {% endfor %}
+                </tbody>
+</table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Quick Actions -->
+  <div class="row mt-4">
+    <div class="col-12 text-center">
+      <div class="btn-group" role="group">
+        <a href="{% url 'prices:add_purchase' %}" class="btn btn-success">
+          <i class="fas fa-plus"></i> Add Purchase
+        </a>
+        <a href="{% url 'prices:purchase_list' %}" class="btn btn-primary">
+          <i class="fas fa-list"></i> View All Purchases
+        </a>
+        <a href="{% url 'prices:home' %}" class="btn btn-secondary">
+          <i class="fas fa-home"></i> Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
 
-</body>
-</html>
+{% endblock %}

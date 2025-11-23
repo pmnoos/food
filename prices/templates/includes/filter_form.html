@@ -1,0 +1,48 @@
+<!-- Common filter form for purchases -->
+<form method="GET" class="row g-3 mb-4">
+    <div class="col-md-2">
+        <select name="year" class="form-select">
+            <option value="">Year</option>
+            {% for year in year_choices %}
+                <option value="{{ year }}" {% if selected_year == year|stringformat:"s" %}selected{% endif %}>{{ year }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="month" class="form-select">
+            <option value="">Month</option>
+            {% for month in month_choices %}
+                <option value="{{ month }}" {% if selected_month == month|stringformat:"s" %}selected{% endif %}>{{ month }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="store" class="form-select">
+            <option value="">Store</option>
+            {% for store in store_choices %}
+                <option value="{{ store }}" {% if selected_store == store %}selected{% endif %}>{{ store }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="product" class="form-select">
+            <option value="">Product</option>
+            {% for product in product_choices %}
+                <option value="{{ product }}" {% if selected_product == product %}selected{% endif %}>{{ product }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="date" class="form-control" value="{{ date_filter }}">
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-secondary">Filter</button>
+        {% if request.resolver_match.url_name == 'totals' %}
+            <a href="{% url 'prices:totals' %}" class="btn btn-outline-secondary">Reset</a>
+        {% elif request.resolver_match.url_name == 'purchase_list' %}
+            <a href="{% url 'prices:purchase_list' %}" class="btn btn-outline-secondary">Reset</a>
+        {% else %}
+            <a href="{% url 'prices:home' %}" class="btn btn-outline-secondary">Reset</a>
+        {% endif %}
+    </div>
+</form>
