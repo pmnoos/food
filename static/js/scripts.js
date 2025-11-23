@@ -1,4 +1,7 @@
-/* eslint-env browser */
+/* global bootstrap */
+/// <reference lib="dom" />
+
+
 
 document.addEventListener('DOMContentLoaded', function() {
     // Focus on the "Add Purchase" button when the page loads
