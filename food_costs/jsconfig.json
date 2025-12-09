@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
-    "lib": ["es6", "dom"],
+    "checkJs": true,
+    "lib": ["dom", "es6"],
     "target": "es6"
   },
   "include": [
-    "**/*.js"
+    "**/*.js",
+    "globals.d.ts"
   ]
 }
