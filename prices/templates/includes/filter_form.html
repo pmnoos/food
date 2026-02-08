@@ -33,10 +33,25 @@
         </select>
     </div>
     <div class="col-md-2">
-        <input type="date" name="date" class="form-control" value="{{ date_filter }}">
+        <input type="date" name="date" class="form-control" value="{{ date_filter }}" placeholder="Exact date">
     </div>
-    <div class="col-md-2 d-flex gap-2">
-        <button type="submit" class="btn btn-secondary">Filter</button>
+    <div class="col-md-2">
+        <input type="date" name="start_date" class="form-control" value="{{ start_date }}" placeholder="Start date">
+    </div>
+    <div class="col-md-2">
+        <input type="date" name="end_date" class="form-control" value="{{ end_date }}" placeholder="End date">
+    </div>
+    <div class="col-md-3">
+        <select name="group_by" class="form-select">
+            <option value="">No Grouping</option>
+            <option value="store_date" {% if group_by == "store_date" %}selected{% endif %}>Store + Date</option>
+            <option value="date" {% if group_by == "date" %}selected{% endif %}>By Date</option>
+            <option value="store" {% if group_by == "store" %}selected{% endif %}>By Store</option>
+            <option value="product" {% if group_by == "product" %}selected{% endif %}>By Product</option>
+        </select>
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-secondary">Filter</button>
         {% if request.resolver_match.url_name == 'totals' %}
             <a href="{% url 'prices:totals' %}" class="btn btn-outline-secondary">Reset</a>
         {% elif request.resolver_match.url_name == 'purchase_list' %}
@@ -45,4 +60,47 @@
             <a href="{% url 'prices:home' %}" class="btn btn-outline-secondary">Reset</a>
         {% endif %}
     </div>
+        <div class="col-12 d-flex gap-2 mt-2">
+                <button type="button" class="btn btn-outline-primary" id="preset-week">This Week</button>
+                <button type="button" class="btn btn-outline-primary" id="preset-month">This Month</button>
+                <button type="button" class="btn btn-outline-primary" id="preset-year">This Year</button>
+        </div>
 </form>
+
+<script>
+    (function() {
+        const form = document.currentScript.previousElementSibling; // the form above
+        function setRange(start, end) {
+            const startInput = form.querySelector('input[name="start_date"]');
+            const endInput = form.querySelector('input[name="end_date"]');
+            if (startInput) startInput.value = start;
+            if (endInput) endInput.value = end;
+            // Clear exact date to avoid conflict
+            const exactDate = form.querySelector('input[name="date"]');
+            if (exactDate) exactDate.value = '';
+            form.submit();
+        }
+        function format(d) {
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+        }
+        document.getElementById('preset-week')?.addEventListener('click', function() {
+            const today = new Date();
+            const start = new Date();
+            start.setDate(today.getDate() - 6);
+            setRange(format(start), format(today));
+        });
+        document.getElementById('preset-month')?.addEventListener('click', function() {
+            const today = new Date();
+            const start = new Date(today.getFullYear(), today.getMonth(), 1);
+            const end = new Date(today.getFullYear(), today.getMonth()+1, 0);
+            setRange(format(start), format(end));
+        });
+        document.getElementById('preset-year')?.addEventListener('click', function() {
+            const today = new Date();
+            const start = new Date(today.getFullYear(), 0, 1);
+            const end = new Date(today.getFullYear(), 11, 31);
+            setRange(format(start), format(end));
+        });
+    })();
+</script>

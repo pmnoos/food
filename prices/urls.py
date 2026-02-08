@@ -8,6 +8,7 @@ from .views import (
     create_store,
     store_list,
     store_edit,
+    store_purchases,
     delete_store,
     create_shopping_list,
     edit_shopping_list,
@@ -18,7 +19,9 @@ from .views import (
     add_purchase,
     edit_purchase,
     delete_purchase,
-    
+    get_last_purchase,
+    price_changes_report,
+    find_replace_tool,
     calculator_view,
     select_year_start
 )
@@ -42,6 +45,7 @@ urlpatterns = [
     path('stores/', store_list, name='store_list'),
     path('create-store/', create_store, name='create_store'),
     path('stores/<int:store_id>/edit/', store_edit, name='store_edit'),
+    path('stores/<int:store_id>/purchases/', store_purchases, name='store_purchases'),
     path('delete-store/<int:store_id>/delete/', delete_store, name='delete_store'),
     # 🔹 Purchases
     path('purchase_list/', purchase_list, name='purchase_list'),
@@ -49,9 +53,12 @@ urlpatterns = [
     path('purchase/<int:purchase_id>/', purchase_detail, name='purchase_detail'),
     path('edit_purchase/<int:purchase_id>/', edit_purchase, name='edit_purchase'),
     path('delete_purchase/<int:purchase_id>/', delete_purchase, name='delete_purchase'),
+    path('api/get-last-purchase/', get_last_purchase, name='get_last_purchase'),
     # 🔹 Reports / Tools
     path('product-details/<int:product_id>/', product_details, name='product_details'),
     path('totals/', totals_view, name='totals'),
+    path('price-changes/', price_changes_report, name='price_changes'),
+    path('find-replace/', find_replace_tool, name='find_replace'),
     path('calculator/', calculator_view, name='calculator'),
     path('select-year-start/', select_year_start, name='select_year_start'),
 ]

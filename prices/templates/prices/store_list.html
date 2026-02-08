@@ -35,6 +35,8 @@
               <td>{{ store.name }}</td>
               <td>
                 <a href="{% url 'prices:store_edit' store.id %}" class="btn btn-warning btn-sm">Edit</a>
+                  <a href="{% url 'prices:store_purchases' store.id %}" class="btn btn-info btn-sm">View Purchases</a>
+                  <a href="{% url 'prices:add_purchase' %}?store_id={{ store.id }}&store_name={{ store.name|urlencode }}" class="btn btn-primary btn-sm">Add Purchase</a>
                   <a href="{% url 'prices:delete_store' store.id %}" class="btn btn-danger btn-sm">Delete</a>
               </td>
             </tr>

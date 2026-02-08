@@ -10,8 +10,8 @@
                     <div class="mb-3">
                         <div class="row align-items-center">
                             <div class="col-10">
-                                {{ form.store_name.label_tag }}
-                                {{ form.store_name }}
+                                {{ form.store.label_tag }}
+                                {{ form.store }}
                                 {{ form.date_of_purchase.label_tag }}
                                 {{ form.date_of_purchase }}
                                 {{ form.item_product.label_tag }}
@@ -42,5 +42,60 @@
     window.onload = function() {
         document.getElementById('{{ form.item_product.id_for_label }}').focus();
     };
+
+    // Auto-fill functionality for previous purchase data
+    (function() {
+        const itemProductField = document.getElementById('{{ form.item_product.id_for_label }}');
+        const priceCostField = document.getElementById('{{ form.price_cost.id_for_label }}');
+        const quantityField = document.getElementById('{{ form.quantity.id_for_label }}');
+        const packageUnitTypeField = document.getElementById('{{ form.package_unit_type.id_for_label }}');
+        
+        let debounceTimer;
+        
+        itemProductField.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            const itemName = this.value.trim();
+            
+            if (itemName.length < 2) {
+                return; // Don't search for very short strings
+            }
+            
+            // Debounce the API call to avoid too many requests
+            debounceTimer = setTimeout(function() {
+                fetch(`{% url 'prices:get_last_purchase' %}?item_name=${encodeURIComponent(itemName)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.found) {
+                            // Pre-fill the fields with previous values
+                            priceCostField.value = data.price_cost;
+                            quantityField.value = data.quantity;
+                            packageUnitTypeField.value = data.package_unit_type;
+                            
+                            // Optional: Add a subtle visual indicator
+                            priceCostField.style.backgroundColor = '#e8f5e9';
+                            quantityField.style.backgroundColor = '#e8f5e9';
+                            packageUnitTypeField.style.backgroundColor = '#e8f5e9';
+                            
+                            // Remove the highlight after a moment
+                            setTimeout(function() {
+                                priceCostField.style.backgroundColor = '';
+                                quantityField.style.backgroundColor = '';
+                                packageUnitTypeField.style.backgroundColor = '';
+                            }, 1500);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching last purchase:', error);
+                    });
+            }, 500); // Wait 500ms after user stops typing
+        });
+        
+        // Allow users to clear auto-filled values by clicking
+        [priceCostField, quantityField, packageUnitTypeField].forEach(field => {
+            field.addEventListener('focus', function() {
+                this.select(); // Select all text on focus for easy editing
+            });
+        });
+    })();
 </script>
 {% endblock %}

@@ -100,8 +100,8 @@
                 </thead>
                 <tbody>
   {% for store in store_totals %}
-                    {% if yearly_total > 0 %}
-                      {% widthratio store.total yearly_total 100 as percentage %}
+                    {% if percentage_base > 0 %}
+                      {% widthratio store.total percentage_base 100 as percentage %}
                     {% else %}
                       {% widthratio 0 1 100 as percentage %}
                     {% endif %}

@@ -4,6 +4,7 @@ from django.db.models import Sum
 from django.utils.timezone import now
 from datetime import timedelta
 from .models import Purchase
+from datetime import datetime as native_datetime
 
 
 def apply_purchase_filters(purchases, request):
@@ -17,6 +18,9 @@ def apply_purchase_filters(purchases, request):
     selected_store = request.GET.get('store', '')
     selected_product = request.GET.get('product', '')
     date_filter = request.GET.get('date', '')
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
+    group_by = request.GET.get('group_by', '')  # New grouping option
     
     if selected_year and selected_year.isdigit():
         purchases = purchases.filter(date_of_purchase__year=int(selected_year))
@@ -30,6 +34,17 @@ def apply_purchase_filters(purchases, request):
         purchases = purchases.filter(item_product=selected_product)
     if date_filter:
         purchases = purchases.filter(date_of_purchase=date_filter)
+    # Range filter support
+    try:
+        if start_date_str:
+            start_date = native_datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            purchases = purchases.filter(date_of_purchase__gte=start_date)
+        if end_date_str:
+            end_date = native_datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            purchases = purchases.filter(date_of_purchase__lte=end_date)
+    except ValueError:
+        # Ignore invalid date formats silently for filters
+        pass
     
     return purchases, {
         'selected_year': selected_year,
@@ -38,6 +53,9 @@ def apply_purchase_filters(purchases, request):
         'selected_store': selected_store,
         'selected_product': selected_product,
         'date_filter': date_filter,
+        'start_date': start_date_str,
+        'end_date': end_date_str,
+        'group_by': group_by,
     }
 
 
@@ -94,3 +112,61 @@ def get_filter_choices():
         'store_choices': store_choices,
         'product_choices': product_choices,
     }
+
+
+def get_grouped_purchases(purchases, group_by):
+    """
+    Group purchases for data verification.
+    Returns grouped data based on the group_by parameter.
+    """
+    from django.db.models import Count
+    
+    if group_by == 'store_date':
+        # Group by store and date with individual purchase details
+        grouped = purchases.values('store_name', 'date_of_purchase').annotate(
+            total=Sum('total_cost'),
+            count=Count('id')
+        ).order_by('-date_of_purchase', 'store_name')
+        
+        # Add individual purchases to each group for verification
+        result = []
+        for group in grouped:
+            group_purchases = purchases.filter(
+                store_name=group['store_name'],
+                date_of_purchase=group['date_of_purchase']
+            ).order_by('item_product')
+            result.append({
+                **group,
+                'purchases': list(group_purchases.values(
+                    'id', 'item_product', 'package_unit_type', 
+                    'quantity', 'price_cost', 'total_cost'
+                ))
+            })
+        return result
+    
+    elif group_by == 'date':
+        # Group by date only
+        grouped = purchases.values('date_of_purchase').annotate(
+            total=Sum('total_cost'),
+            count=Count('id')
+        ).order_by('-date_of_purchase')
+        return list(grouped)
+    
+    elif group_by == 'store':
+        # Group by store only
+        grouped = purchases.values('store_name').annotate(
+            total=Sum('total_cost'),
+            count=Count('id')
+        ).order_by('store_name')
+        return list(grouped)
+    
+    elif group_by == 'product':
+        # Group by product
+        grouped = purchases.values('item_product').annotate(
+            total=Sum('total_cost'),
+            count=Count('id'),
+            avg_price=Sum('price_cost') / Count('id')
+        ).order_by('item_product')
+        return list(grouped)
+    
+    return None

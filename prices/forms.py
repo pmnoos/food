@@ -33,13 +33,14 @@ class ShoppingListForm(forms.ModelForm):
 class PurchaseForm(forms.ModelForm):
     class Meta:
         model = Purchase
-        fields = ['store_name', 'date_of_purchase', 'item_product', 'package_unit_type', 'price_cost', 'quantity']
+        fields = ['store', 'date_of_purchase', 'item_product', 'package_unit_type', 'price_cost', 'quantity']
         widgets = {
             'date_of_purchase': forms.DateInput(attrs={'type': 'date'}),
         }
     
     def __init__(self, *args, **kwargs):
         super(PurchaseForm, self).__init__(*args, **kwargs)
+        self.fields['store'].queryset = Store.objects.all().order_by('name')
         for field in self.fields.values():
             field.widget.attrs['class'] = 'form-control'  # Add Bootstrap class to all fields
 

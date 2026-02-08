@@ -31,6 +31,7 @@ class ShoppingList(models.Model):  # Class names should be capitalized
 
 
 class Purchase(models.Model):
+    store = models.ForeignKey(Store, on_delete=models.SET_NULL, null=True, blank=True)
     store_name = models.CharField(max_length=255)
     date_of_purchase = models.DateField()
     item_product = models.CharField(max_length=255)
@@ -42,21 +43,34 @@ class Purchase(models.Model):
     year = models.IntegerField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
+        # Keep store_name in sync if store provided
+        if self.store and not self.store_name:
+            self.store_name = self.store.name
+        elif not self.store and self.store_name:
+            # Try to link store by name if exists
+            try:
+                self.store = Store.objects.get(name=self.store_name)
+            except Store.DoesNotExist:
+                pass
         # Set year from date if not already set
         if self.date_of_purchase and not self.year:
             self.year = self.date_of_purchase.year
             
         # Calculate total cost
-        self.total_cost = self.price_cost * self.quantity
+        # Ensure Decimal arithmetic
+        price = Decimal(self.price_cost)
+        qty = Decimal(self.quantity)
+        self.total_cost = price * qty
         
         # Calculate running total
         if self.pk is None:  # Only calculate running total for new purchases
             previous_total = Purchase.objects.aggregate(Sum('total_cost'))['total_cost__sum'] or Decimal('0.00')
-            self.running_total = previous_total + self.total_cost
+            previous_total = Decimal(previous_total)
+            self.running_total = previous_total + Decimal(self.total_cost)
         else:
             # If updating an existing purchase, you may want to recalculate the running total
             # This logic can be adjusted based on your requirements
-            self.running_total = self.total_cost  # Adjust as needed for updates
+            self.running_total = Decimal(self.total_cost)  # Adjust as needed for updates
 
         super().save(*args, **kwargs)
 
