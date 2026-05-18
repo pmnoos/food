@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.utils.timezone import now
 from django.db.models import Sum, Q
 from datetime import datetime as native_datetime, timedelta
-import subprocess, os, logging
+import subprocess, os, logging, csv
 from django.http import JsonResponse
 
 from .models import Product, Store, ShoppingList, Purchase
@@ -201,6 +201,31 @@ def delete_purchase(request, purchase_id):
 def purchase_detail(request, purchase_id):
     purchase = get_object_or_404(Purchase, id=purchase_id)
     return render(request, 'prices/purchase_detail.html', {'purchase': purchase})
+# ----------------------
+# CSV Export
+# ----------------------
+def export_totals_csv(request):
+    purchases = Purchase.objects.all()
+    purchases, filter_values = apply_purchase_filters(purchases, request)
+    purchases = purchases.order_by('-date_of_purchase')
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="purchases_export.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Date', 'Store', 'Product', 'Package/Unit', 'Price/Cost', 'Quantity', 'Total Cost'])
+    for p in purchases:
+        writer.writerow([
+            p.date_of_purchase.strftime('%Y-%m-%d'),
+            p.store_name,
+            p.item_product,
+            p.package_unit_type,
+            p.price_cost,
+            p.quantity,
+            p.total_cost,
+        ])
+    return response
+
 # ----------------------
 # Tools and Utilities
 # ----------------------

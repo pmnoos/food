@@ -14,6 +14,7 @@ from .views import (
     edit_shopping_list,
     delete_shopping_list,
     totals_view,
+    export_totals_csv,
     purchase_list,
     purchase_detail,
     add_purchase,
@@ -57,6 +58,7 @@ urlpatterns = [
     # 🔹 Reports / Tools
     path('product-details/<int:product_id>/', product_details, name='product_details'),
     path('totals/', totals_view, name='totals'),
+    path('totals/export/csv/', export_totals_csv, name='export_totals_csv'),
     path('price-changes/', price_changes_report, name='price_changes'),
     path('find-replace/', find_replace_tool, name='find_replace'),
     path('calculator/', calculator_view, name='calculator'),
