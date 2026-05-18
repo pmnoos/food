@@ -19,7 +19,11 @@
             <i class="fas fa-calendar-week text-success totals-icon" style="font-size: 2rem;"></i>
           </div>
           <h5 class="card-title text-success">Weekly Total</h5>
-          <h3 class="card-text text-success">${{ weekly_total|floatformat:2 }}</h3>
+          {% if weekly_total %}
+            <h3 class="card-text text-success">${{ weekly_total|floatformat:2 }}</h3>
+          {% else %}
+            <h3 class="card-text text-muted">-</h3>
+          {% endif %}
           <small class="text-muted">Last 7 days</small>
         </div>
       </div>
@@ -31,8 +35,12 @@
             <i class="fas fa-calendar-alt text-primary totals-icon" style="font-size: 2rem;"></i>
           </div>
           <h5 class="card-title text-primary">Monthly Total</h5>
-          <h3 class="card-text text-primary">${{ monthly_total|floatformat:2 }}</h3>
-          <small class="text-muted">Current month ({{ now|date:"F Y" }})</small>
+          {% if monthly_total %}
+            <h3 class="card-text text-primary">${{ monthly_total|floatformat:2 }}</h3>
+          {% else %}
+            <h3 class="card-text text-muted">-</h3>
+          {% endif %}
+          <small class="text-muted">Current month ({% now "F Y" %})</small>
         </div>
       </div>
     </div>
@@ -43,8 +51,12 @@
             <i class="fas fa-calendar text-warning totals-icon" style="font-size: 2rem;"></i>
           </div>
           <h5 class="card-title text-warning">Yearly Total</h5>
-          <h3 class="card-text text-warning">${{ yearly_total|floatformat:2 }}</h3>
-          <small class="text-muted">Current year ({{ now|date:"Y" }})</small>
+          {% if yearly_total %}
+            <h3 class="card-text text-warning">${{ yearly_total|floatformat:2 }}</h3>
+          {% else %}
+            <h3 class="card-text text-muted">-</h3>
+          {% endif %}
+          <small class="text-muted">Current year ({% now "Y" %})</small>
         </div>
       </div>
     </div>

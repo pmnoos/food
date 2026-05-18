@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+          <h2 class="h5 mb-0">Delete Purchase</h2>
+        </div>
+        <div class="card-body">
+          <p class="mb-3">
+            Are you sure you want to delete the purchase for
+            <strong>{{ purchase.item_product }}</strong> from
+            <strong>{{ purchase.store_name }}</strong>?
+          </p>
+
+          <div class="alert alert-warning" role="alert">
+            This action cannot be undone.
+          </div>
+
+          <table class="table table-sm table-bordered mt-3">
+            <tr>
+              <th>Date</th>
+              <td>{{ purchase.date_of_purchase }}</td>
+            </tr>
+            <tr>
+              <th>Quantity</th>
+              <td>{{ purchase.quantity }}</td>
+            </tr>
+            <tr>
+              <th>Price</th>
+              <td>${{ purchase.price_cost|floatformat:2 }}</td>
+            </tr>
+            <tr>
+              <th>Total</th>
+              <td>${{ purchase.total_cost|floatformat:2 }}</td>
+            </tr>
+          </table>
+
+          <form method="post" class="d-flex gap-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Confirm Delete</button>
+            <a href="{% url 'prices:purchase_list' %}" class="btn btn-secondary">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

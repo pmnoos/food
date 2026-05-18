@@ -43,8 +43,8 @@ class Purchase(models.Model):
     year = models.IntegerField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # Keep store_name in sync if store provided
-        if self.store and not self.store_name:
+        # Keep store_name in sync with selected store.
+        if self.store:
             self.store_name = self.store.name
         elif not self.store and self.store_name:
             # Try to link store by name if exists

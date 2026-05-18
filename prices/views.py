@@ -565,12 +565,12 @@ def create_store(request):
     return render(request, 'prices/stores.html', {'form': form})
 
 def delete_store(request, store_id):
-     item = get_object_or_404(Store, id=store_id)
-     if request.method == 'POST':
+    item = get_object_or_404(Store, id=store_id)
+    if request.method == 'POST':
         item.delete()
         messages.success(request, "Item deleted.")
-        return redirect('store_list')
-     return render(request, 'prices:delete_store.html', {'store': item})
+        return redirect('prices:store_list')
+    return render(request, 'prices/delete_store.html', {'store': item})
 
 def shopping_list(request):
     store_filter = request.GET.get('store', '')
